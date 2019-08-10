@@ -17,9 +17,6 @@ class OutgoingMessageTableViewCell: UITableViewCell, MessageCell {
     @IBOutlet weak var bottomMargin: NSLayoutConstraint!
     
     private enum Constants {
-        static let shadowColor = UIColor(red: 189 / 255, green: 204 / 255, blue: 215 / 255, alpha: 0.54)
-        static let shadowRadius: CGFloat = 2
-        static let shadowOffset = CGSize(width: 0, height: 1)
         static let chainedMessagesBottomMargin: CGFloat = 20
         static let lastMessageBottomMargin: CGFloat = 32
     }

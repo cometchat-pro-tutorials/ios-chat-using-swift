@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ChatViewController: UIViewController {
+final class ChatViewController: UIViewController {
     
     private enum Constants {
         static let incomingMessageCell = "incomingMessageCell"
@@ -17,12 +17,25 @@ class ChatViewController: UIViewController {
         static let placeholderMessage = "Type something"
     }
     
+    
+    // MARK: - Outlets
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var textAreaBackground: UIView!
     @IBOutlet weak var textAreaBottom: NSLayoutConstraint!
     
+    
+    // MARK: - Actions
+    
     @IBAction func onSendButtonTapped(_ sender: Any) {
+        sendMessage()
+    }
+    
+    
+    // MARK: - Interaction
+    
+    private func sendMessage() {
         let message: String = textView.text
         guard !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return
@@ -31,36 +44,54 @@ class ChatViewController: UIViewController {
         textView.endEditing(true)
         addTextViewPlaceholer()
         scrollToLastCell()
-        print(message)
+        
+        ChatService.shared.send(message: message)
     }
     
-    private func scrollToLastCell() {
-        let lastIndexPath = IndexPath(row: tableView.numberOfRows(inSection: 0) - 1, section: 0)
-        tableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+    var messages: [Message] = [] {
+        didSet {
+            tableView.reloadData()
+        }
     }
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "#General"
         
-        tableView.dataSource = self
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 80
-        tableView.tableFooterView = UIView()
-        tableView.separatorStyle = .none
-        tableView.contentInset = UIEdgeInsets(top: Constants.contentInset, left: 0, bottom: 0, right: 0)
-        tableView.allowsSelection = false
+        setUpTableView()
+        setUpTextView()
+        startObservingKeyboard()
         
-        textView.isScrollEnabled = false
-        textView.textContainer.heightTracksTextView = true
+        ChatService.shared.onRecievedMessage = { [weak self] message in
+            self?.messages.append(message)
+            self?.scrollToLastCell()
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        addTextViewPlaceholer()
+    }
+    
+    private var isFirstLaunch = true
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        textView.delegate = self
+        if isFirstLaunch {
+            let welcome = storyboard!.instantiateViewController(withIdentifier: "Welcome")
+            present(welcome, animated: false)
+        }
         
-        textAreaBackground.layer.addShadow(
-            color: UIColor(red: 189 / 255, green: 204 / 255, blue: 215 / 255, alpha: 54 / 100),
-            offset: CGSize(width: 2, height: -2),
-            radius: 4)
-        
+        isFirstLaunch = false
+    }
+    
+    
+    // MARK: - Keyboard
+    
+    private func startObservingKeyboard() {
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(
             forName: UIResponder.keyboardWillShowNotification,
@@ -72,9 +103,6 @@ class ChatViewController: UIViewController {
             object: nil,
             queue: nil,
             using: keyboardWillDisappear)
-        
-        // Scroll to bottom at start
-        tableView.setContentOffset(CGPoint(x: 0, y: .max), animated: false)
     }
     
     deinit {
@@ -93,7 +121,7 @@ class ChatViewController: UIViewController {
         let safeAreaOffset = viewHeight - safeAreaBottom
         
         let lastVisibleCell = tableView.indexPathsForVisibleRows?.last
-
+        
         UIView.animate(
             withDuration: 0.3,
             delay: 0,
@@ -104,7 +132,7 @@ class ChatViewController: UIViewController {
                 if let lastVisibleCell = lastVisibleCell {
                     self.tableView.scrollToRow(at: lastVisibleCell, at: .bottom, animated: false)
                 }
-            })
+        })
     }
     
     private func keyboardWillDisappear(_ notification: Notification) {
@@ -118,83 +146,29 @@ class ChatViewController: UIViewController {
         })
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        addTextViewPlaceholer()
+    
+    // MARK: - Set up
+    
+    private func setUpTextView() {
+        textView.isScrollEnabled = false
+        textView.textContainer.heightTracksTextView = true
+        textView.delegate = self
+        
+        textAreaBackground.layer.addShadow(
+            color: UIColor(red: 189 / 255, green: 204 / 255, blue: 215 / 255, alpha: 54 / 100),
+            offset: CGSize(width: 2, height: -2),
+            radius: 4)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        scrollToLastCell()
+    private func setUpTableView() {
+        tableView.dataSource = self
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 80
+        tableView.tableFooterView = UIView()
+        tableView.separatorStyle = .none
+        tableView.contentInset = UIEdgeInsets(top: Constants.contentInset, left: 0, bottom: 0, right: 0)
+        tableView.allowsSelection = false
     }
-    
-    let messages: [Message] = [
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: true),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a message",
-            isIncoming: false),
-        Message(
-            user: User(image: UIImage(), name: "Marin"),
-            content: "Hi this is a much much much much longer message than the previous one",
-            isIncoming: false),
-    ]
-
 }
 
 // MARK: - UITableViewDataSource
@@ -209,10 +183,8 @@ extension ChatViewController: UITableViewDataSource {
         let message = messages[indexPath.row]
         let cellIdentifier = message.isIncoming ? Constants.incomingMessageCell : Constants.outgoingMessageCell
         
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: cellIdentifier,
-            for: indexPath) as? MessageCell & UITableViewCell else {
-                return UITableViewCell()
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? MessageCell & UITableViewCell else {
+            return UITableViewCell()
         }
         
         cell.message = message
@@ -225,6 +197,16 @@ extension ChatViewController: UITableViewDataSource {
         }
         
         return cell
+    }
+    
+    private func scrollToLastCell() {
+        let lastRow = tableView.numberOfRows(inSection: 0) - 1
+        guard lastRow > 0 else {
+            return
+        }
+        
+        let lastIndexPath = IndexPath(row: lastRow, section: 0)
+        tableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
     }
 }
 

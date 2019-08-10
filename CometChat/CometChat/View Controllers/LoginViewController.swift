@@ -8,7 +8,7 @@
 
 import UIKit
 
-class LoginViewController: UIViewController {
+final class LoginViewController: UIViewController {
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var emailTextFieldBackground: UIView!
@@ -32,7 +32,28 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
+        let email = emailTextField.text!
+        guard !email.isEmpty else {
+            return
+        }
         
+        ChatService.shared.login(email: email) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.navigationController?.dismiss(animated: true)
+                case .failure(let error):
+                    print(error)
+                    self?.showError(error)
+                }
+            }
+        }
+    }
+    
+    private func showError(_ error: String) {
+        let alert = UIAlertController(title: error, message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default))
+        navigationController?.present(alert, animated: true)
     }
 
 }
