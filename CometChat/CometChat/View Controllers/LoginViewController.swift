@@ -9,6 +9,10 @@
 import UIKit
 
 final class LoginViewController: UIViewController {
+    
+    private enum Constants {
+        static let showChat = "showChat"
+    }
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var emailTextFieldBackground: UIView!
@@ -26,6 +30,12 @@ final class LoginViewController: UIViewController {
             radius: 15)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let navigationBar = navigationController?.navigationBar
+        navigationBar?.shadowImage = UIImage()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
@@ -41,7 +51,7 @@ final class LoginViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    self?.navigationController?.dismiss(animated: true)
+                    self?.performSegue(withIdentifier: Constants.showChat, sender: nil)
                 case .failure(let error):
                     print(error)
                     self?.showError(error)

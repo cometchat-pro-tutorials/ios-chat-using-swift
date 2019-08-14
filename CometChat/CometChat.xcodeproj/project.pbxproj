@@ -22,7 +22,6 @@
 		F5FD0A3022FC79E40096E777 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FD0A2F22FC79E40096E777 /* Message.swift */; };
 		F5FD0A3322FC80B70096E777 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FD0A3222FC80B70096E777 /* WelcomeViewController.swift */; };
 		F5FD0A3522FD49FE0096E777 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5FD0A3422FD49FE0096E777 /* Assets.xcassets */; };
-		F5FD0A3722FD4BAB0096E777 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FD0A3622FD4BAB0096E777 /* SignUpViewController.swift */; };
 		F5FD0A3922FD5DCF0096E777 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FD0A3822FD5DCF0096E777 /* LoginViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,7 +45,6 @@
 		F5FD0A2F22FC79E40096E777 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		F5FD0A3222FC80B70096E777 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		F5FD0A3422FD49FE0096E777 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F5FD0A3622FD4BAB0096E777 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		F5FD0A3822FD5DCF0096E777 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,7 +153,6 @@
 			children = (
 				F58DB6B422F322970018C36D /* ChatViewController.swift */,
 				F5FD0A3222FC80B70096E777 /* WelcomeViewController.swift */,
-				F5FD0A3622FD4BAB0096E777 /* SignUpViewController.swift */,
 				F5FD0A3822FD5DCF0096E777 /* LoginViewController.swift */,
 			);
 			path = "View Controllers";
@@ -277,7 +274,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5FD0A3922FD5DCF0096E777 /* LoginViewController.swift in Sources */,
-				F5FD0A3722FD4BAB0096E777 /* SignUpViewController.swift in Sources */,
 				F58DB6B522F322970018C36D /* ChatViewController.swift in Sources */,
 				F5FD0A3322FC80B70096E777 /* WelcomeViewController.swift in Sources */,
 				F5F961E522FD8C3F006C0196 /* ChatService.swift in Sources */,

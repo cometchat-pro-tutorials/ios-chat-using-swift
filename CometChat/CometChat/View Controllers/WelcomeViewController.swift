@@ -11,7 +11,6 @@ import UIKit
 final class WelcomeViewController: UIViewController {
     
     @IBOutlet weak var loginButton: UIButton!
-    @IBOutlet weak var signUpButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,16 +22,11 @@ final class WelcomeViewController: UIViewController {
         navigationBar?.shadowImage = UIImage()
                 
         loginButton.layer.cornerRadius = 5
-        signUpButton.layer.cornerRadius = 5
         
         loginButton.layer.addShadow(
             color: .buttonShadow,
             offset: CGSize(width: 0, height: 5),
             radius: 15)
-        signUpButton.layer.addShadow(
-            color: .buttonShadow,
-            offset: CGSize(width: 0, height: 5),
-            radius: 20)
     }
     
     override func viewWillAppear(_ animated: Bool) {

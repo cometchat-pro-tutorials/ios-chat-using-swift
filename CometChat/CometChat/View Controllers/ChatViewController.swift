@@ -24,6 +24,7 @@ final class ChatViewController: UIViewController {
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var textAreaBackground: UIView!
     @IBOutlet weak var textAreaBottom: NSLayoutConstraint!
+    @IBOutlet weak var emptyChatView: UIView!
     
     
     // MARK: - Actions
@@ -50,6 +51,7 @@ final class ChatViewController: UIViewController {
     
     var messages: [Message] = [] {
         didSet {
+            emptyChatView.isHidden = !messages.isEmpty
             tableView.reloadData()
         }
     }
@@ -60,6 +62,8 @@ final class ChatViewController: UIViewController {
         super.viewDidLoad()
         title = "#General"
         
+        emptyChatView.isHidden = false
+                
         setUpTableView()
         setUpTextView()
         startObservingKeyboard()
@@ -73,19 +77,18 @@ final class ChatViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         addTextViewPlaceholer()
+        
+        ChatService.shared.getMessages { [weak self] messages in
+            self?.messages = messages
+            self?.scrollToLastCell()
+        }
     }
-    
-    private var isFirstLaunch = true
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if isFirstLaunch {
-            let welcome = storyboard!.instantiateViewController(withIdentifier: "Welcome")
-            present(welcome, animated: false)
-        }
-        
-        isFirstLaunch = false
+        // Add default shadow to navigation bar
+        let navigationBar = navigationController?.navigationBar
+        navigationBar?.shadowImage = nil
     }
     
     

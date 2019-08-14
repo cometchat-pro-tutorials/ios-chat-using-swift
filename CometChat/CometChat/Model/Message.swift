@@ -7,9 +7,18 @@
 //
 
 import UIKit
+import CometChatPro
 
 struct Message {
     let user: User
     let content: String
     let isIncoming: Bool
+}
+
+extension Message {
+    init(_ textMessage: TextMessage, isIncoming: Bool) {
+        user = User(name: textMessage.senderUid)
+        content = textMessage.text
+        self.isIncoming = isIncoming
+    }
 }

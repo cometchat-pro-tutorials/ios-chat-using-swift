@@ -44,10 +44,10 @@ final class ChatService {
             UID: email,
             apiKey: Constants.cometChatAPIKey,
             onSuccess: { user in
-                self.user = User(name: user.uid ?? "unknown user")
+                self.user = User(name: email)
                 self.joinGroup()
                 DispatchQueue.main.async {
-                    onComplete(.success(User(name: user.uid ?? "unknown user")))
+                    onComplete(.success(self.user!))
                 }
             }, onError: { error in
                 print("Error logging in:")
@@ -83,6 +83,42 @@ final class ChatService {
             })
     }
     
+    private var messagesRequest: MessagesRequest?
+    
+    func getMessages(onComplete: @escaping ([Message])-> Void) {
+        guard let user = user else {
+            return
+        }
+        
+        let limit = 50
+        
+        messagesRequest = MessagesRequest.MessageRequestBuilder()
+            .set(limit: limit)
+            .set(guid: Constants.groupID)
+            .build()
+        
+        messagesRequest!.fetchPrevious(
+            onSuccess: { fetchedMessages in
+                print("Fetched \(fetchedMessages?.count ?? 0) older messages")
+                guard let fetchedMessages = fetchedMessages else {
+                    onComplete([])
+                    return
+                }
+                
+                let messages = fetchedMessages
+                    .compactMap { $0 as? TextMessage }
+                    .map { Message($0, isIncoming: $0.senderUid != user.name.lowercased()) }
+                
+                DispatchQueue.main.async {
+                    onComplete(messages)
+                }
+            },
+            onError: { error in
+                print("Fetching messages failed with error:")
+                print(error?.errorDescription ?? "unknown")
+            })
+    }
+    
     private func joinGroup() {
         CometChat.joinGroup(
             GUID: Constants.groupID,
@@ -101,11 +137,8 @@ final class ChatService {
 extension ChatService: CometChatMessageDelegate {
     
     func onTextMessageReceived(textMessage: TextMessage) {
-        let content = textMessage.text
-        let sender = User(name: textMessage.senderUid)
-        let message = Message(user: sender, content: content, isIncoming: true)
         DispatchQueue.main.async {
-            self.onRecievedMessage?(message)
+            self.onRecievedMessage?(Message(textMessage, isIncoming: true))
         }
     }
     
