@@ -57,7 +57,7 @@ final class ChatViewController: UIViewController {
     super.viewDidLoad()
     title = "#General"
     
-    emptyChatView.isHidden = false
+    emptyChatView.isHidden = true
     
     setUpTableView()
     setUpTextView()
