@@ -46,15 +46,10 @@ final class ChatViewController: UIViewController {
     addTextViewPlaceholer()
     scrollToLastCell()
     
-    ChatService.shared.send(message: message)
+    
   }
   
-  var messages: [Message] = [] {
-    didSet {
-      emptyChatView.isHidden = !messages.isEmpty
-      tableView.reloadData()
-    }
-  }
+  var messages: [Message] = []
   
   // MARK: - Lifecycle
   
@@ -66,24 +61,15 @@ final class ChatViewController: UIViewController {
     
     setUpTableView()
     setUpTextView()
-    startObservingKeyboard()
     
-    ChatService.shared.onRecievedMessage = { [weak self] message in
-      self?.messages.append(message)
-      self?.scrollToLastCell()
-    }
     
-    tableView.dataSource = self
   }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     addTextViewPlaceholer()
     
-    ChatService.shared.getMessages { [weak self] messages in
-      self?.messages = messages
-      self?.scrollToLastCell()
-    }
+    
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -91,72 +77,6 @@ final class ChatViewController: UIViewController {
     // Add default shadow to navigation bar
     let navigationBar = navigationController?.navigationBar
     navigationBar?.shadowImage = nil
-  }
-  
-  
-  // MARK: - Keyboard
-  
-  private func startObservingKeyboard() {
-    let notificationCenter = NotificationCenter.default
-    notificationCenter.addObserver(
-      forName: UIResponder.keyboardWillShowNotification,
-      object: nil,
-      queue: nil,
-      using: keyboardWillAppear)
-    notificationCenter.addObserver(
-      forName: UIResponder.keyboardWillHideNotification,
-      object: nil,
-      queue: nil,
-      using: keyboardWillDisappear)
-  }
-  
-  deinit {
-    let notificationCenter = NotificationCenter.default
-    notificationCenter.removeObserver(
-      self,
-      name: UIResponder.keyboardWillShowNotification,
-      object: nil)
-    notificationCenter.removeObserver(
-      self,
-      name: UIResponder.keyboardWillHideNotification,
-      object: nil)
-  }
-  
-  private func keyboardWillAppear(_ notification: Notification) {
-    let key = UIResponder.keyboardFrameEndUserInfoKey
-    guard let keyboardFrame = notification.userInfo?[key] as? CGRect else {
-      return
-    }
-    
-    let safeAreaBottom = view.safeAreaLayoutGuide.layoutFrame.maxY
-    let viewHeight = view.bounds.height
-    let safeAreaOffset = viewHeight - safeAreaBottom
-    
-    let lastVisibleCell = tableView.indexPathsForVisibleRows?.last
-    
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      options: [.curveEaseInOut],
-      animations: {
-        self.textAreaBottom.constant = -keyboardFrame.height + safeAreaOffset
-        self.view.layoutIfNeeded()
-        if let lastVisibleCell = lastVisibleCell {
-          self.tableView.scrollToRow(
-            at: lastVisibleCell, at: .bottom, animated: false)
-        }
-    })
-  }
-  
-  private func keyboardWillDisappear(_ notification: Notification) {
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      options: [.curveEaseInOut],
-      animations: {
-        self.textAreaBottom.constant = 0
-        self.view.layoutIfNeeded()
-    })
   }
   
   
@@ -180,43 +100,6 @@ final class ChatViewController: UIViewController {
     tableView.separatorStyle = .none
     tableView.contentInset = UIEdgeInsets(top: Constants.contentInset, left: 0, bottom: 0, right: 0)
     tableView.allowsSelection = false
-  }
-}
-
-// MARK: - UITableViewDataSource
-extension ChatViewController: UITableViewDataSource {
-  
-  func tableView(
-    _ tableView: UITableView,
-    numberOfRowsInSection section: Int) -> Int {
-    return messages.count
-  }
-  
-  func tableView(
-    _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    
-    let message = messages[indexPath.row]
-    let cellIdentifier = message.isIncoming ?
-      Constants.incomingMessageCell :
-      Constants.outgoingMessageCell
-    
-    guard let cell = tableView.dequeueReusableCell(
-      withIdentifier: cellIdentifier, for: indexPath)
-      as? MessageCell & UITableViewCell else {
-        return UITableViewCell()
-    }
-    
-    cell.message = message
-    
-    if indexPath.row < messages.count - 1 {
-      let nextMessage = messages[indexPath.row + 1]
-      cell.showsAvatar = message.isIncoming != nextMessage.isIncoming
-    } else {
-      cell.showsAvatar = true
-    }
-    
-    return cell
   }
   
   private func scrollToLastCell() {
