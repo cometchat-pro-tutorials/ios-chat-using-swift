@@ -9,5 +9,5 @@
 import UIKit
 
 struct User: Equatable {
-    let name: String
+  let name: String
 }

@@ -9,28 +9,28 @@
 import UIKit
 
 final class WelcomeViewController: UIViewController {
+  
+  @IBOutlet weak var loginButton: UIButton!
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
     
-    @IBOutlet weak var loginButton: UIButton!
+    let navigationBar = navigationController?.navigationBar
+    navigationBar?.backIndicatorImage = #imageLiteral(resourceName: "back")
+    navigationBar?.backIndicatorTransitionMaskImage = #imageLiteral(resourceName: "back")
+    navigationBar?.barTintColor = .white
+    navigationBar?.shadowImage = UIImage()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        let navigationBar = navigationController?.navigationBar
-        navigationBar?.backIndicatorImage = #imageLiteral(resourceName: "back")
-        navigationBar?.backIndicatorTransitionMaskImage = #imageLiteral(resourceName: "back")
-        navigationBar?.barTintColor = .white
-        navigationBar?.shadowImage = UIImage()
-                
-        loginButton.layer.cornerRadius = 5
-        
-        loginButton.layer.addShadow(
-            color: .buttonShadow,
-            offset: CGSize(width: 0, height: 5),
-            radius: 15)
-    }
+    loginButton.layer.cornerRadius = 5
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
-    }
+    loginButton.layer.addShadow(
+      color: .buttonShadow,
+      offset: CGSize(width: 0, height: 5),
+      radius: 15)
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.setNavigationBarHidden(true, animated: true)
+  }
 }

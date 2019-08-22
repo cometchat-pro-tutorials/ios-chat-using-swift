@@ -9,6 +9,6 @@
 import UIKit
 
 protocol MessageCell: class {
-    var message: Message? { get set }
-    var showsAvatar: Bool { get set }
+  var message: Message? { get set }
+  var showsAvatar: Bool { get set }
 }
