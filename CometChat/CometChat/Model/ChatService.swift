@@ -14,9 +14,10 @@ extension String: Error {}
 final class ChatService {
   
   private enum Constants {
-    #warning("Don't forget to set your API key and app ID here!")
-    static let cometChatAPIKey = "API_KEY"
-    static let cometChatAppID = "APP_ID"
+    #warning("Don't forget to set your , REGION Code, API key and app ID here!")
+    static let cometChatAPIKey = "ENTER API KEY"
+    static let cometChatAppID = "ENTER APP ID"
+    static let cometChatRegionCode = "ENTER REGION CODE"
     static let groupID = "supergroup"
   }
   
@@ -24,9 +25,10 @@ final class ChatService {
   private init() {}
   
   static func initialize() {
-    CometChat(
-      appId: Constants.cometChatAppID,
-      onSuccess: { isSuccess in
+    
+    let settings = AppSettings.AppSettingsBuilder().setRegion(region: Constants.cometChatRegionCode).subscribePresenceForAllUsers().build()
+    
+    CometChat.init(appId: Constants.cometChatAppID, appSettings: settings, onSuccess: { isSuccess in
         print("CometChat connected successfully: \(isSuccess)")
     },
       onError: { error in
@@ -66,7 +68,6 @@ final class ChatService {
     let textMessage = TextMessage(
       receiverUid: Constants.groupID,
       text: message,
-      messageType: .text,
       receiverType: .group)
     
     CometChat.sendTextMessage(
